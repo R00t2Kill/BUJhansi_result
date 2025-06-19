@@ -6,6 +6,10 @@ import base64
 import os
 from PyPDF2 import PdfMerger
 def func(rollno=231381030001,ddlCourse="1030203",result_type=""):
+
+    print("ok")
+    os.makedirs("./results", exist_ok=True)
+
     # Target URL
     url = "https://exam.bujhansi.ac.in/frmViewCampusCurrentResult.aspx?cd=MwA3ADkA"
 
@@ -55,7 +59,11 @@ def func(rollno=231381030001,ddlCourse="1030203",result_type=""):
         }
     """)
 
+<<<<<<< HEAD
     for i in range(rollno,rollno+67):
+=======
+    for i in range(int(rollno),int(rollno)+67):
+>>>>>>> a7c6440 (final_ig)
         # Form data
         payload = {
             "__VIEWSTATE": viewstate,
@@ -126,6 +134,7 @@ def func(rollno=231381030001,ddlCourse="1030203",result_type=""):
 
     print(f"Merged PDF saved as {output_pdf}")
 
+<<<<<<< HEAD
 rollno=input("Plz enter a valid roll no.(the starting one): ")
 ddlCourse=input("Plz enter the corresponding CourseID: ")
 result_type=input("Enter 6 for special back(otherwise leave empty): ")
@@ -133,3 +142,7 @@ if rollno and ddlCourse or result_type:
     func(rollno,ddlCourse,result_type)
 else:
     func()
+=======
+
+
+>>>>>>> a7c6440 (final_ig)
