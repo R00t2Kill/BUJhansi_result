@@ -2,13 +2,15 @@ import requests
 from bs4 import BeautifulSoup
 from weasyprint import HTML, CSS
 import base64
-
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 import os
 from PyPDF2 import PdfMerger
-def func(rollno=231381030001,ddlCourse="1030203",result_type=""):
+import time
+def func(rollno_from=231381030001,rollno_to=231381030067,ddlCourse="1030203",course_name=None,result_type=""):
 
     print("ok")
-    os.makedirs("./results", exist_ok=True)
+    os.makedirs(f"./results{course_name}", exist_ok=True)
 
     # Target URL
     url = "https://exam.bujhansi.ac.in/frmViewCampusCurrentResult.aspx?cd=MwA3ADkA"
@@ -18,14 +20,26 @@ def func(rollno=231381030001,ddlCourse="1030203",result_type=""):
         "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0",
         "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/png,image/svg+xml,*/*;q=0.8",
         "Referer": url,
-    }
+    }   
 
-    # Start session
-    session = requests.Session()
+    session=requests.Session()
 
-    # Step 1: Get hidden fields
-    response = session.get(url, headers=headers)
-    soup = BeautifulSoup(response.text, 'html.parser')
+    retries = Retry(total=3, backoff_factor=1, status_forcelist=[500, 502, 503, 504])
+    adapter = HTTPAdapter(max_retries=retries)
+
+    session.mount("http://", adapter)
+    session.mount("https://", adapter)
+
+    if os.path.exists("./src_page"):
+        with open("./src_page","r") as fobj:
+            response_text=fobj.read()
+    else:
+        page=session.get(url,headers=headers,timeout=10)
+        response_text=page.text
+        with open("./src_page","w") as fobj:
+            fobj.write(response_text)
+
+    soup = BeautifulSoup(response_text, 'html.parser')
 
     # Extract hidden fields
     viewstate = soup.find("input", {"name": "__VIEWSTATE"})["value"] if soup.find("input", {"name": "__VIEWSTATE"}) else ""
@@ -59,11 +73,10 @@ def func(rollno=231381030001,ddlCourse="1030203",result_type=""):
         }
     """)
 
-<<<<<<< HEAD
-    for i in range(rollno,rollno+67):
-=======
-    for i in range(int(rollno),int(rollno)+67):
->>>>>>> a7c6440 (final_ig)
+    print("start")
+    for i in range(int(rollno_from),int(rollno_to)+1):
+        print("main")
+
         # Form data
         payload = {
             "__VIEWSTATE": viewstate,
@@ -76,13 +89,17 @@ def func(rollno=231381030001,ddlCourse="1030203",result_type=""):
         }
 
         # Step 2: Submit form
-        response = session.post(url, headers=headers, data=payload)
+        print("yo")
+        response = session.post(url, headers=headers, data=payload,timeout=10)
+        time.sleep(1)
+        print("yes")
         soup = BeautifulSoup(response.text, 'html.parser')
         
         #check if response is valid result
         if soup.find(string='NAME OF FATHER'):
             # Find all image tags
             for img_tag in soup.find_all("img"):
+                print("img")
                 if "src" in img_tag.attrs:
                     img_url = img_tag["src"]
                     
@@ -91,7 +108,7 @@ def func(rollno=231381030001,ddlCourse="1030203",result_type=""):
                         img_url = "https://exam.bujhansi.ac.in/" + img_url
 
                     # Download and convert to Base64
-                    img_response = session.get(img_url)
+                    img_response = session.get(img_url,timeout=10)
                     img_base64 = base64.b64encode(img_response.content).decode()
                     img_format = img_response.headers["Content-Type"].split("/")[-1]  # Get image format
 
@@ -104,15 +121,15 @@ def func(rollno=231381030001,ddlCourse="1030203",result_type=""):
 
 
             # Convert HTML to PDF
-            HTML(string=html_content).write_pdf(f"results/result_{i}.pdf", stylesheets=[css])
+            HTML(string=html_content).write_pdf(f"{course_name}_results/result_{i}.pdf", stylesheets=[css])
 
-            print(f"PDF saved as result_{i}.pdf")
+            print(f"PDF saved as result_{i}.pdf in results{course_name}")
 
 
 
 
     # Directory containing the downloaded PDFs
-    pdf_directory = "results/"
+    pdf_directory = f"results{course_name}/"
 
     # Get list of all PDFs in the directory, sorted in numerical order
     pdf_files = sorted(
@@ -128,21 +145,9 @@ def func(rollno=231381030001,ddlCourse="1030203",result_type=""):
         merger.append(os.path.join(pdf_directory, pdf))
 
     # Save the merged PDF
-    output_pdf = "merged_results.pdf"
+    output_pdf = f"{course_name}_merged_results.pdf"
     merger.write(output_pdf)
     merger.close()
 
     print(f"Merged PDF saved as {output_pdf}")
 
-<<<<<<< HEAD
-rollno=input("Plz enter a valid roll no.(the starting one): ")
-ddlCourse=input("Plz enter the corresponding CourseID: ")
-result_type=input("Enter 6 for special back(otherwise leave empty): ")
-if rollno and ddlCourse or result_type:
-    func(rollno,ddlCourse,result_type)
-else:
-    func()
-=======
-
-
->>>>>>> a7c6440 (final_ig)
