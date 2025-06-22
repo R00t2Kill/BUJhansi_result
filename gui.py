@@ -52,7 +52,7 @@ def submit_form():
 	rollto=roll_entry_to.get()
 	result = result_type.get()
 	course_selected = course.get() 
-	print(course_selected)   
+
 	
 	if not rollfrom.strip():
 		messagebox.showerror("Input Error", "Roll number cannot be empty!")

@@ -9,7 +9,6 @@ from PyPDF2 import PdfMerger
 import time
 def func(rollno_from=231381030001,rollno_to=231381030067,ddlCourse="1030203",course_name=None,result_type=""):
 
-    print("ok")
     os.makedirs(f"./results{course_name}", exist_ok=True)
 
     # Target URL
@@ -73,9 +72,8 @@ def func(rollno_from=231381030001,rollno_to=231381030067,ddlCourse="1030203",cou
         }
     """)
 
-    print("start")
+
     for i in range(int(rollno_from),int(rollno_to)+1):
-        print("main")
 
         # Form data
         payload = {
@@ -89,17 +87,16 @@ def func(rollno_from=231381030001,rollno_to=231381030067,ddlCourse="1030203",cou
         }
 
         # Step 2: Submit form
-        print("yo")
+
         response = session.post(url, headers=headers, data=payload,timeout=10)
         time.sleep(1)
-        print("yes")
+
         soup = BeautifulSoup(response.text, 'html.parser')
         
         #check if response is valid result
         if soup.find(string='NAME OF FATHER'):
             # Find all image tags
             for img_tag in soup.find_all("img"):
-                print("img")
                 if "src" in img_tag.attrs:
                     img_url = img_tag["src"]
                     
