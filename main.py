@@ -9,7 +9,8 @@ from PyPDF2 import PdfMerger
 import time
 def func(rollno_from=231381030001,rollno_to=231381030067,ddlCourse="1030203",course_name=None,result_type=""):
 
-    os.makedirs(f"./results{course_name}", exist_ok=True)
+    os.makedirs(f"./{course_name}_results", exist_ok=True)
+
 
     # Target URL
     url = "https://exam.bujhansi.ac.in/frmViewCampusCurrentResult.aspx?cd=MwA3ADkA"
@@ -126,7 +127,11 @@ def func(rollno_from=231381030001,rollno_to=231381030067,ddlCourse="1030203",cou
 
 
     # Directory containing the downloaded PDFs
-    pdf_directory = f"results{course_name}/"
+
+
+
+    pdf_directory = f"{course_name}_results/"
+
 
     # Get list of all PDFs in the directory, sorted in numerical order
     pdf_files = sorted(
