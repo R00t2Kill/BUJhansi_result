@@ -49,29 +49,49 @@ def func(rollno_from=231381030001,rollno_to=231381030067,ddlCourse="1030203",cou
 
     # Define CSS to fix page cutoff issue
     css = CSS(string="""
-        @page { 
-            size: A4 landscape; /* Set wider page size */
-            margin: 20px; 
+        @page {
+            size: 260mm 297mm;  /* Slightly wider than A4 */
+            margin: 10mm;
         }
-        body { 
-            word-wrap: break-word;
-            overflow-wrap: break-word; 
-            font-size: 12px;
+
+        html, body {
+            font-size: 9px;
+            margin: 0;
+            padding: 0;
         }
-        img { 
-            max-width: 100%; 
-            display: block; 
-            margin: 10px auto; 
-        }
-        table { 
-            width: 100%; 
+
+        table {
+            width: 100%;
             border-collapse: collapse;
+            table-layout: auto; /* allow flexible sizing */
+            page-break-inside: avoid;
         }
-        td, th { 
-            padding: 5px; 
-            border: 1px solid #ddd; 
+
+        td, th {
+            border: 1px solid #000;
+            padding: 2px;
+            word-break: break-word;
+            overflow-wrap: break-word;
+            font-size: 8.5px;
+        }
+
+        tr {
+            page-break-inside: avoid;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            page-break-inside: avoid;
         }
     """)
+
+
+
+
+
+
 
 
     for i in range(int(rollno_from),int(rollno_to)+1):
@@ -119,7 +139,7 @@ def func(rollno_from=231381030001,rollno_to=231381030067,ddlCourse="1030203",cou
 
 
             # Convert HTML to PDF
-            HTML(string=html_content).write_pdf(f"{course_name}_results/result_{i}.pdf", stylesheets=[css])
+            HTML(string=html_content).write_pdf(f"{course_name}_results/result_{i}.pdf",stylesheets=[css])
 
             print(f"PDF saved as result_{i}.pdf in results{course_name}")
 
